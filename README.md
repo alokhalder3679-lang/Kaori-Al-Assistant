@@ -1,5 +1,5 @@
 <div align="center">
-<img width="1200" height="475"https://imgur.com/gallery/kaori-al-assistant-eIynDUT" />
+<img width="1200" height="475"https://imgur.com/gallery/kaori-al-assistant-eIynDUT![Kaori Al Assistant](https://i.imgur.com/W6enkER.jpeg" />
 </div>
 
 # Run and deploy your AI Studio app
