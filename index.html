@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+    <script>
+      (function() {
+        try {
+          var originalFetch = window.fetch || globalThis.fetch;
+          var currentFetch = originalFetch;
+
+          function safePatch(obj) {
+            try {
+              Object.defineProperty(obj, 'fetch', {
+                get: function() { return currentFetch; },
+                set: function(val) { currentFetch = val; },
+                configurable: true,
+                enumerable: true
+              });
+            } catch (err) {
+              console.warn("[Fetch Security Patch] failed to patch object:", err);
+            }
+          }
+
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            safePatch(Window.prototype);
+          }
+          if (typeof window !== 'undefined') {
+            safePatch(window);
+          }
+          if (typeof globalThis !== 'undefined') {
+            safePatch(globalThis);
+          }
+        } catch (e) {
+          console.warn("[Fetch Security Patch] Fatal crash during bootstrap:", e);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "ut75a9264",
+    "category": "preference",
+    "text": "The user prefers to speak in Bengali.",
+    "createdAt": "2026-06-12T09:38:55.211Z",
+    "updatedAt": "2026-07-08T11:09:25.000Z"
+  },
+  {
+    "id": "4o9wz4jio",
+    "category": "identity",
+    "text": "The user's name is alok Halder.",
+    "createdAt": "2026-06-12T10:08:06.203Z",
+    "updatedAt": "2026-06-12T10:08:06.203Z"
+  },
+  {
+    "id": "s6f7g8h9j",
+    "category": "goal",
+    "text": "The user's goal is to be a software engineer.",
+    "createdAt": "2026-07-08T10:55:37.000Z",
+    "updatedAt": "2026-07-08T10:55:37.000Z"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "name": "Remix: Kaori AI Assistant",
+  "description": "A real-time, voice-to-voice holographic companion named Kaori using the Gemini Live API, now augmented with a complete AI Creative Studio for generating music, video animations, art canvases, and high cognitive thinking backed by Firebase Firestore.",
+  "requestFramePermissions": [
+    "microphone",
+    "display-capture"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

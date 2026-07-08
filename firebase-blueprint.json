@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "StudioCreation": {
+      "title": "Studio Creation",
+      "description": "An asset created in the Multimedia AI Creative Studio",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner UID of the user who created this asset"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["image", "video", "music"],
+          "description": "Type of asset"
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Generation prompt used"
+        },
+        "params": {
+          "type": "object",
+          "description": "Parameters used for generation"
+        },
+        "assetData": {
+          "type": "string",
+          "description": "Base64 data or media asset source url"
+        },
+        "lyrics": {
+          "type": "string",
+          "description": "Accompanying audio lyric lines"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "Content MIME type"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when created"
+        }
+      },
+      "required": ["userId", "type", "prompt", "assetData"]
+    },
+    "UserMemory": {
+      "title": "User Memory",
+      "description": "A persistent memory or preference of the user",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the user who owns this memory"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["identity", "preference", "goal", "project", "relationship", "emotional", "behavior"],
+          "description": "Category classification"
+        },
+        "text": {
+          "type": "string",
+          "description": "Descriptive recall details"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when added"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when updated"
+        }
+      },
+      "required": ["userId", "category", "text"]
+    }
+  },
+  "firestore": {
+    "studio_creations/{creationId}": {
+      "schema": "StudioCreation",
+      "description": "Collection of creative assets (images, music, videos) saved by users"
+    },
+    "user_memories/{memoryId}": {
+      "schema": "UserMemory",
+      "description": "Collection of personalized memories/recalls saved by registered users"
+    }
+  }
+}

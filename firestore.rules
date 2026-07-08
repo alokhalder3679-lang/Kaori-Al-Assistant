@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Pillar 8: Default Deny Catch-all)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------
+    // Global Hardened Helpers
+    // -------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'google.com');
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // -------------------------------------------------------------
+    // Entity Schema Validators
+    // -------------------------------------------------------------
+    
+    // Studio Creation Entity Validation (Pillar 2: Validation Blueprints)
+    function isValidStudioCreation(data) {
+      return data.keys().hasAll(['userId', 'type', 'prompt', 'assetData', 'createdAt'])
+        && data.keys().size() <= 8
+        && data.userId == request.auth.uid
+        && data.type is string
+        && (data.type == 'image' || data.type == 'video' || data.type == 'music')
+        && data.prompt is string
+        && data.prompt.size() <= 5000
+        && data.assetData is string
+        && data.assetData.size() <= 1048576  // Max 1MB URL/Base64 references
+        && (!data.keys().contains('lyrics') || (data.lyrics is string && data.lyrics.size() <= 10000))
+        && (!data.keys().contains('mimeType') || (data.mimeType is string && data.mimeType.size() <= 128))
+        && data.createdAt == request.time;
+    }
+
+    // User Memory Entity Validation
+    function isValidUserMemory(data) {
+      return data.keys().hasAll(['userId', 'category', 'text', 'createdAt', 'updatedAt'])
+        && data.keys().size() == 5
+        && data.userId == request.auth.uid
+        && data.category is string
+        && (data.category == 'identity' || data.category == 'preference' || data.category == 'goal' || data.category == 'project' || data.category == 'relationship' || data.category == 'emotional' || data.category == 'behavior')
+        && data.text is string
+        && data.text.size() <= 5000
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    // -------------------------------------------------------------
+    // Collections Match Blocks
+    // -------------------------------------------------------------
+
+    // Match studio_creations
+    match /studio_creations/{creationId} {
+      allow get: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isVerifiedUser() 
+        && isValidId(creationId)
+        && isValidStudioCreation(incoming());
+        
+      allow update: if false; // Studio assets are immutable once saved
+      
+      allow delete: if isVerifiedUser() 
+        && isValidId(creationId)
+        && existing().userId == request.auth.uid;
+    }
+
+    // Match user_memories
+    match /user_memories/{memoryId} {
+      allow get: if isVerifiedUser() && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isVerifiedUser()
+        && isValidId(memoryId)
+        && isValidUserMemory(incoming());
+        
+      allow update: if isVerifiedUser()
+        && isValidId(memoryId)
+        && existing().userId == request.auth.uid
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && isValidUserMemory(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['text', 'category', 'updatedAt']);
+        
+      allow delete: if isVerifiedUser()
+        && isValidId(memoryId)
+        && existing().userId == request.auth.uid;
+    }
+  }
+}
